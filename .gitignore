@@ -1,0 +1,14 @@
+__pycache__
+.venv
+*.o
+core
+*~
+*.core
+test
+test_*
+.qmake.stash
+.vscode
+*/stl/stl
+*.pro.user
+prg1/prg1
+a.out
