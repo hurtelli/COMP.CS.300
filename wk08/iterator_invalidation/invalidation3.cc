@@ -1,6 +1,7 @@
 #include <iterator>
 #include <vector>
 #include <algorithm>
+#include <iostream>
 
 using namespace std;
 
@@ -11,20 +12,15 @@ using namespace std;
  * @param vec vector to be handled
  */
 void duplicateEvenRemoveUneven(std::vector<int>& vec) {
-
-    using Iter = std::vector<int>::iterator;
-
-    Iter begin = vec.begin();
-    Iter end = vec.end();
-    for ( Iter it = begin; it < end; it++){
-        if ( *it % 2 == 0 ){
-            vec.insert(it, *it);
-            it++;
-
+    for(auto it = vec.begin();it!=vec.end();++it){
+        if(*it%2==0){
+            int v =*it;
+            vec.insert(it+1,v);
+            ++it;
         }
-        else {
+        else{
             vec.erase(it);
-            it--;
+            --it;
         }
     }
 }
