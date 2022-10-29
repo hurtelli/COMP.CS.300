@@ -1,8 +1,8 @@
 // Datastructures.hh
 //
-// Student name:
-// Student email:
-// Student number:
+// Student name: Otto Palmgren
+// Student email: otto.palmgren@tuni.fi
+// Student number: 50327953
 
 #ifndef DATASTRUCTURES_HH
 #define DATASTRUCTURES_HH
@@ -14,6 +14,10 @@
 #include <limits>
 #include <functional>
 #include <exception>
+
+#include <map>
+#include <deque>
+
 
 // Types for IDs
 using StationID = std::string;
@@ -203,8 +207,41 @@ public:
     RegionID common_parent_of_regions(RegionID id1, RegionID id2);
 
 private:
-    // Add stuff needed for your class implementation here
 
+    struct Station{
+        StationID id_="";
+        Name name_="";
+        Coord coords_={};
+
+        std::vector<std::pair<StationID,Time>> departures_ = {};
+
+    };
+
+    struct Region{
+        RegionID rid_ = '"';
+        Name rname_="";
+        std::vector<Coord> rcoords_={};
+
+        std::vector<Region*> sub_regions ={};
+        std::unordered_map<StationID,Station*> reg_stations = {};
+        //std::deque<RegionID> reg_path_ = {};
+
+        Region* parent_ = nullptr;
+    };
+
+
+    // Add stuff needed for your class implementation here
+    std::unordered_map<StationID,Station*> Stations;
+    std::multimap<Name,StationID> station_names;
+    std::multimap<double,StationID> station_dists;
+
+    std::map<RegionID,Region*> Regions;
+
+    void add_distance(Station*);
+    void allsubofreg(Region*,std::vector<RegionID>&);
+    std::vector<RegionID> recu(Region*,std::vector<RegionID>&);
+    bool dequrecu(Region*,std::deque<RegionID>&);
+    RegionID iter_forward(Region*,std::vector<RegionID>&);
 };
 
 #endif // DATASTRUCTURES_HH
