@@ -17,6 +17,7 @@
 
 #include <map>
 #include <deque>
+#include <memory>
 
 
 // Types for IDs
@@ -210,38 +211,38 @@ private:
 
     struct Station{
         StationID id_="";
-        Name name_="";
-        Coord coords_={};
+        Name name_=NO_NAME;
+        Coord coords_=NO_COORD;
 
         std::vector<std::pair<StationID,Time>> departures_ = {};
 
     };
 
     struct Region{
-        RegionID rid_ = '"';
-        Name rname_="";
-        std::vector<Coord> rcoords_={};
+        RegionID rid_ = 0;
+        Name rname_=NO_NAME;
+        std::vector<Coord> rcoords_={NO_COORD};
 
-        std::vector<Region*> sub_regions ={};
-        std::unordered_map<StationID,Station*> reg_stations = {};
+        std::vector<std::shared_ptr<Region>> sub_regions_ ={};
+        std::unordered_map<StationID,std::shared_ptr<Station>> reg_stations_ = {};
         //std::deque<RegionID> reg_path_ = {};
 
-        Region* parent_ = nullptr;
+        std::shared_ptr<Region> parent_ = nullptr;
     };
 
 
     // Add stuff needed for your class implementation here
-    std::unordered_map<StationID,Station*> Stations;
-    std::multimap<Name,StationID> station_names;
-    std::multimap<double,StationID> station_dists;
+    std::map<StationID,std::shared_ptr<Station>> Stations;
+    std::multimap<Name,StationID> stat_names;
+    std::multimap<unsigned int,StationID> stat_dists;
 
-    std::map<RegionID,Region*> Regions;
+    std::map<RegionID,std::shared_ptr<Region>> Regions;
 
-    void add_distance(Station*);
-    void allsubofreg(Region*,std::vector<RegionID>&);
-    std::vector<RegionID> recu(Region*,std::vector<RegionID>&);
-    bool dequrecu(Region*,std::deque<RegionID>&);
-    RegionID iter_forward(Region*,std::vector<RegionID>&);
+    unsigned int distance(Coord&);
+    void allsubofreg(std::shared_ptr<Region>,std::vector<RegionID>&);
+    std::vector<RegionID> recu(std::shared_ptr<Region>,std::vector<RegionID>&);
+    bool dequrecu(std::shared_ptr<Region>,std::deque<RegionID>&);
+    RegionID iter_forward(std::shared_ptr<Region>,std::vector<RegionID>&);
 };
 
 #endif // DATASTRUCTURES_HH
