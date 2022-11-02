@@ -63,10 +63,7 @@ void Datastructures::clear_all()
 
 }
 
-//n=100  0.0031s
-//n=1000  0.34s
-//n=10000 >40s
-//????!?!?!?!?!?!?!?!?!?!?!?!!?
+
 std::vector<StationID> Datastructures::all_stations()
 {
     std::vector<StationID> station_ids = {};
@@ -79,10 +76,10 @@ std::vector<StationID> Datastructures::all_stations()
 
 bool Datastructures::add_station(StationID id, const Name& name, Coord xy)
 {
-    auto i = Stations.find(id); //O(log (n))
+    auto i = Stations.find(id); //O(log(n))
     if(i==Stations.end()){
         std::shared_ptr<Station> station(new Station{id, name, xy,{}});
-        Stations.insert({id,station});  //O(log (n))
+        Stations.insert({id,station});  //O(log(n))
         stat_names.insert({name,id}); //O(log(n))
         stat_dists.insert({distance(xy),id});  //O(log(n))
         return true;
@@ -100,7 +97,7 @@ unsigned int Datastructures::distance(Coord& xy){
 
 Name Datastructures::get_station_name(StationID id)
 {
-    auto i = Stations.find(id); //O(log (n))
+    auto i = Stations.find(id); //O(log(n))
     if(i==Stations.end()){return NO_NAME;}
     else{
         if(i->second->name_==""){
@@ -117,7 +114,7 @@ Name Datastructures::get_station_name(StationID id)
 Coord Datastructures::get_station_coordinates(StationID id)
 {
 
-    auto i =Stations.find(id); //O(log (n))
+    auto i =Stations.find(id); //O(log(n))
     if(i==Stations.end()){
         return NO_COORD;
     }
@@ -234,7 +231,6 @@ bool Datastructures::add_region(RegionID id, const Name &name, std::vector<Coord
         return false;
     }
     else{
-        //memoryloss tälle struct objectille koko ajan?
         std::shared_ptr<Region> reg(new Region{id,name,coords,{},{},nullptr});
         Regions.insert({id,reg});   //O(log (n))
         return true;
