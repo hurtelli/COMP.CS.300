@@ -234,6 +234,8 @@ private:
     // Add stuff needed for your class implementation here
     std::map<StationID,std::shared_ptr<Station>> Stations;
     std::multimap<Name,StationID> stat_names;
+
+    //toisin päin nopeempi???
     std::multimap<unsigned int,StationID> stat_dists;
 
     std::map<RegionID,std::shared_ptr<Region>> Regions;

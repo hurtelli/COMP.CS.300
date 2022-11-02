@@ -54,6 +54,11 @@ void Datastructures::clear_all()
     Stations.clear();   //O(n)
     stat_names.clear(); //O(n)
     stat_dists.clear(); //O(n)
+    for(auto& reg : Regions){   //O(n)
+        reg.second->parent_=nullptr;
+        reg.second->sub_regions_.clear();
+        reg.second->reg_stations_.clear();
+    }
     Regions.clear();    //O(n)
 
 }
@@ -71,10 +76,11 @@ std::vector<StationID> Datastructures::all_stations()
     return station_ids;
 }
 
+
 bool Datastructures::add_station(StationID id, const Name& name, Coord xy)
 {
     auto i = Stations.find(id); //O(log (n))
-    if(i==Stations.end()){  //O(n)
+    if(i==Stations.end()){
         std::shared_ptr<Station> station(new Station{id, name, xy,{}});
         Stations.insert({id,station});  //O(log (n))
         stat_names.insert({name,id}); //O(log(n))
@@ -221,7 +227,7 @@ std::vector<std::pair<Time, TrainID>> Datastructures::station_departures_after(S
 }
 
 
-//jostain syystä vitun hidas luokkaa 0.0002 joskus jopa 0.008
+
 bool Datastructures::add_region(RegionID id, const Name &name, std::vector<Coord> coords)
 {
     if(Regions.find(id)!=Regions.end()){    //O(log (n))
@@ -229,7 +235,7 @@ bool Datastructures::add_region(RegionID id, const Name &name, std::vector<Coord
     }
     else{
         //memoryloss tälle struct objectille koko ajan?
-        std::shared_ptr<Region> reg(new Region{id,name,coords});
+        std::shared_ptr<Region> reg(new Region{id,name,coords,{},{},nullptr});
         Regions.insert({id,reg});   //O(log (n))
         return true;
     }
@@ -368,15 +374,16 @@ std::vector<StationID> Datastructures::stations_closest_to(Coord xy)
     std::vector<StationID> closest_stat_ids={};
     std::map<int,StationID> closest={};
     for(const auto& stat : Stations){   //O(n)
-        double dist = sqrt(((stat.second->coords_.x - xy.x) * (stat.second->coords_.x - xy.x)) + ((stat.second->coords_.y - xy.y) * (stat.second->coords_.y - xy.y)));
+        int dist = sqrt(((stat.second->coords_.x - xy.x) * (stat.second->coords_.x - xy.x)) + ((stat.second->coords_.y - xy.y) * (stat.second->coords_.y - xy.y)));
         closest.insert({dist,stat.second->id_});    //O(log (n))
     }
     for(const auto& i : closest){   //O(n))
         if(closest_stat_ids.size()==3){break;}
-        else{closest_stat_ids.push_back(i.second);} //O(log (n))
+        else{closest_stat_ids.push_back(i.second);} //O(1)
     }
     return closest_stat_ids;
 }
+
 
 
 bool Datastructures::remove_station(StationID id)
