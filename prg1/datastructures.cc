@@ -53,6 +53,7 @@ void Datastructures::clear_all()
 {
     Stations.clear();   //O(n)
     stat_names.clear(); //O(n)
+    stat_coords.clear();//O(n)
     stat_dists.clear(); //O(n)
     for(auto& reg : Regions){   //O(n)
         reg.second->parent_=nullptr;
@@ -83,6 +84,7 @@ bool Datastructures::add_station(StationID id, const Name& name, Coord xy)
         Stations.insert({id,station});  //O(log(n))
         stat_names.insert({name,id}); //O(log(n))
         stat_dists.insert({distance(xy),id});  //O(log(n))
+        stat_coords.insert({xy,id});
         return true;
     }
     else{
@@ -113,9 +115,7 @@ Coord Datastructures::get_station_coordinates(StationID id)
 {
 
     auto i =Stations.find(id); //O(log(n))
-    if(i==Stations.end()){
-        return NO_COORD;
-    }
+    if(i==Stations.end()){return NO_COORD;}
     else{
         return i->second->coords_;
     }
@@ -143,16 +143,13 @@ std::vector<StationID> Datastructures::stations_distance_increasing()
 
 
 //onko nopeempaa?
-//perftest 3/10
-//should be almost constant
+//perftest 6/10
+//esimerkissä erillinen lista todnäk
 StationID Datastructures::find_station_with_coord(Coord xy)
 {
-    for(const auto& stat : Stations){   //O(n)
-        if(stat.second->coords_==xy){
-            return stat.second->id_;
-        }
-    }
-    return NO_STATION;
+    auto stat = stat_coords.find(xy);
+    if(stat==stat_coords.end()){return NO_STATION;}
+    else{return stat->second;}
 
 }
 
@@ -164,6 +161,8 @@ bool Datastructures::change_station_coord(StationID id, Coord newcoord)
         return false;;
     }
     else{
+        stat_coords.erase(i->second->coords_);
+        stat_coords.insert({newcoord,id});
         i->second->coords_ = newcoord;
         return true;
     }
@@ -173,33 +172,34 @@ bool Datastructures::change_station_coord(StationID id, Coord newcoord)
 //too many commands?
 bool Datastructures::add_departure(StationID stationid, TrainID trainid, Time time)
 {
-    if(Stations.find(stationid)==Stations.end()){   //O(log (n))
+    auto stat = Stations.find(stationid);
+    if(stat==Stations.end()){   //O(log (n))
         return false;
     }
     else{
-        Stations[stationid]->departures_.push_back({trainid,time});   //O(1)
+        stat->second->departures_.insert({time,trainid});   //O(1)
         return true;
     }
 }
 
 
-//liian hidas
 //perftest 10/10
 //still more commands than ref implementation
 bool Datastructures::remove_departure(StationID stationid, TrainID trainid, Time time)
 {
-
-    if(Stations.find(stationid)==Stations.end()){   //O(log(n))
+    auto stat = Stations.find(stationid);
+    if(stat==Stations.end()){   //O(log(n))
         return false;
     }
     else{
-        for(unsigned int i=0;i<Stations[stationid]->departures_.size();++i){ //O(n)
-            if(Stations[stationid]->departures_.at(0).first==trainid and Stations[stationid]->departures_.at(0).second==time){
-                Stations[stationid]->departures_.erase(Stations[stationid]->departures_.begin()+i); //O(log (n))
-                return true;
-            }
+        auto dep = stat->second->departures_.find(time);
+        if(dep==stat->second->departures_.end() or dep->second!=trainid){
+            return false;
         }
-        return false;
+        else{
+            stat->second->departures_.erase(time);
+            return true;
+        }
     }
 }
 
@@ -211,14 +211,15 @@ bool Datastructures::remove_departure(StationID stationid, TrainID trainid, Time
 std::vector<std::pair<Time, TrainID>> Datastructures::station_departures_after(StationID stationid, Time time)
 {
     std::vector<std::pair<Time,TrainID>> stat_deps = {};
-    if(Stations.find(stationid)==Stations.end()){   //=(log (n))
+    auto stat = Stations.find(stationid);
+    if(stat==Stations.end()){   //=(log (n))
         stat_deps.push_back({NO_TIME,NO_STATION}); //O(1)
     }
     else{
-        for(const auto& dep : Stations[stationid]->departures_){    //O(n)
-            if(dep.second>time){
-                stat_deps.push_back({dep.second,dep.first});    //O(1)
-            }
+        auto lb = stat->second->departures_.lower_bound(time);    //O(log(n))
+        while(lb!=stat->second->departures_.end()){ //O(n)
+            stat_deps.push_back({lb->first,lb->second});
+            ++lb;
         }
     }
     return stat_deps;
@@ -293,11 +294,14 @@ bool Datastructures::add_subregion_to_region(RegionID id, RegionID parentid)
 
 bool Datastructures::add_station_to_region(StationID id, RegionID parentid)
 {
-    if(Regions.find(parentid)==Regions.end() or Stations.find(id)==Stations.end()){ //O(log(n))
+    auto preg = Regions.find(parentid);
+    auto stat = Stations.find(id);
+    if(preg==Regions.end() or stat==Stations.end()){ //O(log(n))
         return false;
     }
     else{
-        Regions[parentid]->reg_stations_.insert({id, Stations[id]});   //O(log(n))
+        preg->second->reg_stations_.insert({id, Stations[id]});   //O(log(n))
+        stat->second->in_reg_ = preg->second;
         return true;
     }
 }
@@ -305,25 +309,20 @@ bool Datastructures::add_station_to_region(StationID id, RegionID parentid)
 
 
 //could be faster
-//perftest 6/10
+//perftest 3/10
 //should be almost totally constant
 std::vector<RegionID> Datastructures::station_in_regions(StationID id)
 {
     std::vector<RegionID> stat_in_regs ={};
-    if(Stations.find(id)==Stations.end()){  //O(log(n))
+    auto stat = Stations.find(id);
+    if(stat==Stations.end()){  //O(log(n))
         return {NO_REGION};
     }
     else{
-        for(auto& reg :Regions){    //O(n)
-            if(reg.second->reg_stations_.find(id)!=reg.second->reg_stations_.end()){    //O(log (n))
-
-                std::shared_ptr<Region> ptr = reg.second;
-                while(ptr){ //O(n)?
-                    stat_in_regs.push_back(ptr->rid_);  //O(1)
-                    ptr = ptr->parent_;
-                }
-                break;
-            }
+        auto ptr = stat->second->in_reg_;
+        while(ptr){ //O(n)?
+            stat_in_regs.push_back(ptr->rid_);  //O(1)
+            ptr = ptr->parent_;
         }
         return stat_in_regs;
     }

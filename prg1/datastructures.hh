@@ -216,12 +216,16 @@ public:
 
 private:
 
+    struct Region;
+
     struct Station{
         StationID id_="";
         Name name_=NO_NAME;
         Coord coords_=NO_COORD;
 
-        std::vector<std::pair<StationID,Time>> departures_ = {};
+        std::multimap<Time,StationID> departures_ = {};
+
+        std::shared_ptr<Region> in_reg_ = nullptr;
 
     };
 
@@ -241,6 +245,7 @@ private:
     // Add stuff needed for your class implementation here
     std::map<StationID,std::shared_ptr<Station>> Stations;
     std::multimap<Name,StationID> stat_names;
+    std::multimap<Coord,StationID> stat_coords;
 
     //toisin päin nopeempi???
     std::multimap<unsigned int,StationID> stat_dists;
