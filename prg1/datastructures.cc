@@ -64,6 +64,7 @@ void Datastructures::clear_all()
 }
 
 
+//performance 10/10
 std::vector<StationID> Datastructures::all_stations()
 {
     std::vector<StationID> station_ids = {};
@@ -95,22 +96,19 @@ unsigned int Datastructures::distance(Coord& xy){
 }
 
 
+//perftest station_info 6/10
+//should be about const
 Name Datastructures::get_station_name(StationID id)
 {
     auto i = Stations.find(id); //O(log(n))
     if(i==Stations.end()){return NO_NAME;}
     else{
-        if(i->second->name_==""){
-            return NO_NAME;
-        }
-
-        else{
-            std::string ret = Stations[id]->name_;
-            return ret;
-        }
+        return i->second->name_;
     }
 }
 
+//perftest station_info 6/10
+//should be about const
 Coord Datastructures::get_station_coordinates(StationID id)
 {
 
@@ -123,7 +121,7 @@ Coord Datastructures::get_station_coordinates(StationID id)
     }
 }
 
-
+//perftest 10/10
 std::vector<StationID> Datastructures::stations_alphabetically()
 {
     std::vector<StationID> ret = {};
@@ -133,7 +131,7 @@ std::vector<StationID> Datastructures::stations_alphabetically()
     return ret;
 }
 
-
+//perftest 10/10
 std::vector<StationID> Datastructures::stations_distance_increasing()
 {
     std::vector<StationID> stats_dist_increasing ={};
@@ -145,19 +143,20 @@ std::vector<StationID> Datastructures::stations_distance_increasing()
 
 
 //onko nopeempaa?
+//perftest 3/10
+//should be almost constant
 StationID Datastructures::find_station_with_coord(Coord xy)
 {
     for(const auto& stat : Stations){   //O(n)
-        auto i = Stations.find(stat.first); //O(log (n))
-        if(i->second->coords_.x==xy.x and i->second->coords_.y==xy.y){
-            return i->second->id_;
+        if(stat.second->coords_==xy){
+            return stat.second->id_;
         }
     }
     return NO_STATION;
 
 }
 
-
+//perftest 10/10
 bool Datastructures::change_station_coord(StationID id, Coord newcoord)
 {
     auto i = Stations.find(id); //O(log (n))
@@ -170,21 +169,23 @@ bool Datastructures::change_station_coord(StationID id, Coord newcoord)
     }
 }
 
-
+//perftest 6/10
+//too many commands?
 bool Datastructures::add_departure(StationID stationid, TrainID trainid, Time time)
 {
     if(Stations.find(stationid)==Stations.end()){   //O(log (n))
         return false;
     }
     else{
-        std::pair<StationID,Time> topi = std::make_pair(trainid,time);
-        Stations[stationid]->departures_.push_back(topi);   //O(1)
+        Stations[stationid]->departures_.push_back({trainid,time});   //O(1)
         return true;
     }
 }
 
 
 //liian hidas
+//perftest 10/10
+//still more commands than ref implementation
 bool Datastructures::remove_departure(StationID stationid, TrainID trainid, Time time)
 {
 
@@ -205,18 +206,18 @@ bool Datastructures::remove_departure(StationID stationid, TrainID trainid, Time
 
 //funktion pitää järjestää lähdöt aikajärjestykseen
 //PASKA FUNKTIO
+//perftest 6/10
+// too much commands?
 std::vector<std::pair<Time, TrainID>> Datastructures::station_departures_after(StationID stationid, Time time)
 {
     std::vector<std::pair<Time,TrainID>> stat_deps = {};
     if(Stations.find(stationid)==Stations.end()){   //=(log (n))
-        std::pair<Time,TrainID> errorpair = std::make_pair(NO_TIME,NO_STATION);
-        stat_deps.push_back(errorpair); //O(1)
+        stat_deps.push_back({NO_TIME,NO_STATION}); //O(1)
     }
     else{
         for(const auto& dep : Stations[stationid]->departures_){    //O(n)
             if(dep.second>time){
-                std::pair<Time,TrainID> pb = std::make_pair(dep.second,dep.first);
-                stat_deps.push_back(pb);    //O(1)
+                stat_deps.push_back({dep.second,dep.first});    //O(1)
             }
         }
     }
@@ -246,28 +247,24 @@ std::vector<RegionID> Datastructures::all_regions()
     return all_regs;
 }
 
-
+//perftest region_info 6/10
+//should be almost constant??
 Name Datastructures::get_region_name(RegionID id)
 {
     if(Regions.find(id)==Regions.end()){    //O(log (n))
         return NO_NAME;
     }
     else{
-        if(Regions[id]->rname_==""){
-            return NO_NAME;
-        }
-        else{
-            return Regions[id]->rname_;
-        }
+        return Regions[id]->rname_;
     }
 }
 
-
+//perftest region_info 6/10
+//should be almost constant??
 std::vector<Coord> Datastructures::get_region_coords(RegionID id)
 {
     if(Regions.find(id)==Regions.end()){    //O(log (n))
-        std::vector<Coord> r = {NO_COORD};
-        return r;
+        return {NO_COORD};
     }
     else{
         return Regions[id]->rcoords_;
@@ -277,11 +274,11 @@ std::vector<Coord> Datastructures::get_region_coords(RegionID id)
 
 bool Datastructures::add_subregion_to_region(RegionID id, RegionID parentid)
 {
-    if(Regions.find(parentid)==Regions.end()){  //O(log (n))
+    if(Regions.find(parentid)==Regions.end()){  //O(log(n))
         return false;
     }
     else{
-        if(Regions.find(id)==Regions.end()){    //O(log (n))
+        if(Regions.find(id)==Regions.end()){    //O(log(n))
             return false;
         }
         else{
@@ -296,15 +293,11 @@ bool Datastructures::add_subregion_to_region(RegionID id, RegionID parentid)
 
 bool Datastructures::add_station_to_region(StationID id, RegionID parentid)
 {
-    if(Regions.find(parentid)==Regions.end() or Stations.find(id)==Stations.end()){ //O(log (n))
+    if(Regions.find(parentid)==Regions.end() or Stations.find(id)==Stations.end()){ //O(log(n))
         return false;
     }
     else{
-        /*  EI TARVETTA?
-        std::shared_ptr<Station> newstation(new Station{id,"",{},{}});
-        Stations.insert({id,newstation});
-        */
-        Regions[parentid]->reg_stations_.insert({id, Stations[id]});   //O(log (n))
+        Regions[parentid]->reg_stations_.insert({id, Stations[id]});   //O(log(n))
         return true;
     }
 }
@@ -312,12 +305,13 @@ bool Datastructures::add_station_to_region(StationID id, RegionID parentid)
 
 
 //could be faster
+//perftest 6/10
+//should be almost totally constant
 std::vector<RegionID> Datastructures::station_in_regions(StationID id)
 {
     std::vector<RegionID> stat_in_regs ={};
-    if(Stations.find(id)==Stations.end()){  //O(log (n))
-        stat_in_regs.push_back(NO_REGION);  //O(1)
-        return stat_in_regs;
+    if(Stations.find(id)==Stations.end()){  //O(log(n))
+        return {NO_REGION};
     }
     else{
         for(auto& reg :Regions){    //O(n)
@@ -328,6 +322,7 @@ std::vector<RegionID> Datastructures::station_in_regions(StationID id)
                     stat_in_regs.push_back(ptr->rid_);  //O(1)
                     ptr = ptr->parent_;
                 }
+                break;
             }
         }
         return stat_in_regs;
@@ -397,7 +392,6 @@ bool Datastructures::remove_station(StationID id)
             if(stat.second==id){stat_names.erase(stat.first);break;}  //O(log (n))
         }
 
-        //invalid read of size 8
         Stations.erase(i);  //O(1)
         return true;
     }
