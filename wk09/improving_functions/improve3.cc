@@ -2,6 +2,7 @@
 #include <vector>
 #include <map>
 #include <algorithm>
+#include <numeric>
 
 
 /**
@@ -16,11 +17,8 @@
  */
 std::map<int, int> cumulativeSums(std::vector<int> v) {
     std::map<int,int> sums;
-    for (unsigned int i=0; i<v.size(); ++i) {
-        if (sums.empty())
-        { sums[v[i]] = v[i]; }
-        else
-        { sums[v[i]] = sums.at(v[i-1]) + v[i]; }
+    for(unsigned int i=0;i<v.size();++i){
+        sums.insert({v.at(i),std::accumulate(v.begin(),v.begin()+i,v.at(i))});
     }
     return sums;
 }
