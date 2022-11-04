@@ -18,7 +18,7 @@
 std::map<int, int> cumulativeSums(std::vector<int> v) {
     std::map<int,int> sums;
     for(unsigned int i=0;i<v.size();++i){
-        sums.insert({v.at(i),std::accumulate(v.begin(),v.begin()+i,v.at(i))});
+        sums[v.at(i)] = std::accumulate(v.begin(),v.begin()+i,v.at(i));
     }
     return sums;
 }
