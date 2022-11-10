@@ -142,9 +142,8 @@ public:
                                     //pushing back vector O(1)
     std::vector<StationID> stations_distance_increasing();
 
-    // Estimate of performance: O(n*log(n))
-    // Short rationale for estimate: iterating through a map
-                                    //map.find() on every iter
+    // Estimate of performance: O(log(n))
+    // Short rationale for estimate: finding from a map
     StationID find_station_with_coord(Coord xy);
 
     // Estimate of performance: O(log(n))
@@ -155,10 +154,8 @@ public:
     // Short rationale for estimate: one map.find()
     bool add_departure(StationID stationid, TrainID trainid, Time time);
 
-    // Estimate of performance: O(n*log(n))
-    // Short rationale for estimate: highest term is
-                                //iterating through a map
-                                //every iter map.erase()
+    // Estimate of performance: O(log(n))
+    // Short rationale for estimate: highest term is O(log(n))
     bool remove_departure(StationID stationid, TrainID trainid, Time time);
 
     // Estimate of performance: O(n)
@@ -192,13 +189,15 @@ public:
     // Short rationale for estimate: map.insert() | map.find()
     bool add_station_to_region(StationID id, RegionID parentid);
 
-    // Estimate of performance: O(n^2*log(n)
-    // Short rationale for estimate: SLOW
+    // Estimate of performance: O(log(n))
+    // Short rationale for estimate: highest term is O(n), but the n
+                                    //isn't the n, but instead k region
+                                    //parent amount.
     std::vector<RegionID> station_in_regions(StationID id);
 
     // Non-compulsory operations
 
-    // Estimate of performance: O(n!)
+    // Estimate of performance: O(log(n))
     // Short rationale for estimate: SLOW?
     std::vector<RegionID> all_subregions_of_region(RegionID id);
 
@@ -206,7 +205,7 @@ public:
     // Short rationale for estimate: SLOW
     std::vector<StationID> stations_closest_to(Coord xy);
 
-    // Estimate of performance: O(n*log(n))
+    // Estimate of performance: O(log(n))
     // Short rationale for estimate: highest term 2*n*log(n)
     bool remove_station(StationID id);
 
@@ -215,6 +214,20 @@ public:
     RegionID common_parent_of_regions(RegionID id1, RegionID id2);
 
 private:
+
+//TODO:
+    //get the complexities right on this document
+    //debug
+    //create the external doc for this prg
+
+    //find out what is the complexity of station_in_regions
+                                    //and all_subregions_of_region
+
+    //fix funcs common_parent_of_regions
+            //and all_subregions_of_region
+
+    //improve stations_closest_to
+            //and remove_station
 
     struct Region;
 
@@ -255,7 +268,7 @@ private:
     unsigned int distance(Coord&);
     void allsubofreg(std::shared_ptr<Region>,std::vector<RegionID>&);
     std::vector<RegionID> recu(std::shared_ptr<Region>,std::vector<RegionID>&);
-    bool dequrecu(std::shared_ptr<Region>,std::deque<RegionID>&);
+    void dequrecu(std::shared_ptr<Region>,std::deque<RegionID>&);
     RegionID iter_forward(std::shared_ptr<Region>,std::vector<RegionID>&);
 };
 

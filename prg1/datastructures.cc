@@ -31,24 +31,35 @@ Type random_in_range(Type start, Type end)
 // Also remove comments from the parameter names when you implementää lähdöt aikajärjestykseen
 // an operation (Commenting out parameter name prevents compiler from
 // warning about unused parameters on operations you haven't yet implemented.)
-
+/**
+ * @brief constructor, no function as of now
+ */
 Datastructures::Datastructures()
 {
     // Write any initialization you need here
 }
 
+/**
+ * @brief Datastructures::~Datastructures destructor, calls clear_all()
+ */
 Datastructures::~Datastructures()
 {
     clear_all();
 }
 
+/**
+ * @brief station_count returns the amount of entries in Stations
+ * @return Stations entries amount
+ */
 unsigned int Datastructures::station_count()
 {
     return Stations.size();
 }
 
 
-
+/**
+ * @brief clear_all empties out all containers and destroys objects sharedptrs
+ */
 void Datastructures::clear_all()
 {
     Stations.clear();   //O(n)
@@ -66,6 +77,10 @@ void Datastructures::clear_all()
 
 
 //performance 10/10
+/**
+ * @brief all_stations, gathers all station ids to a vector
+ * @return vector with all station ids
+ */
 std::vector<StationID> Datastructures::all_stations()
 {
     std::vector<StationID> station_ids = {};
@@ -75,7 +90,13 @@ std::vector<StationID> Datastructures::all_stations()
     return station_ids;
 }
 
-
+/**
+ * @brief add_station adds a station to needed datastructures
+ * @param id is the id for the station being added
+ * @param name is the name of the station with id id
+ * @param xy are the coordinates of forementioned station
+ * @return false if station already exists, true if not
+ */
 bool Datastructures::add_station(StationID id, const Name& name, Coord xy)
 {
     auto i = Stations.find(id); //O(log(n))
@@ -92,7 +113,11 @@ bool Datastructures::add_station(StationID id, const Name& name, Coord xy)
     }
 }
 
-
+/**
+ * @brief distance calculates the coordinates distance from 0,0
+ * @param xy the coordinates to be calculated with
+ * @return the distance
+ */
 unsigned int Datastructures::distance(Coord& xy){
     return sqrt((xy.x * xy.x) + (xy.y * xy.y));
 }
@@ -100,6 +125,11 @@ unsigned int Datastructures::distance(Coord& xy){
 
 //perftest station_info 6/10
 //should be about const
+/**
+ * @brief get_station_name finds the name associated with station with id
+ * @param id is the id of the station which name is being searched
+ * @return the name of the station with id id
+ */
 Name Datastructures::get_station_name(StationID id)
 {
     auto i = Stations.find(id); //O(log(n))
@@ -111,6 +141,11 @@ Name Datastructures::get_station_name(StationID id)
 
 //perftest station_info 6/10
 //should be about const
+/**
+ * @brief get_station_coordinates finds the coordinates of a station
+ * @param id is the id of the station which coordinates we search
+ * @return the coordinates
+ */
 Coord Datastructures::get_station_coordinates(StationID id)
 {
 
@@ -122,6 +157,10 @@ Coord Datastructures::get_station_coordinates(StationID id)
 }
 
 //perftest 10/10
+/**
+ * @brief stations_alphabetically returns stations sorted alphabetically
+ * @return stations sorted alphabetically,empty if no stations found
+ */
 std::vector<StationID> Datastructures::stations_alphabetically()
 {
     std::vector<StationID> ret = {};
@@ -132,6 +171,10 @@ std::vector<StationID> Datastructures::stations_alphabetically()
 }
 
 //perftest 10/10
+/**
+ * @brief stations_distance_increasing returns stations sorted by distance
+ * @return stations sorted by distance, empty if no stations found
+ */
 std::vector<StationID> Datastructures::stations_distance_increasing()
 {
     std::vector<StationID> stats_dist_increasing ={};
@@ -142,18 +185,27 @@ std::vector<StationID> Datastructures::stations_distance_increasing()
 }
 
 
-//onko nopeempaa?
-//perftest 6/10
-//esimerkissä erillinen lista todnäk
+//perftest 10/10
+/**
+ * @brief find_station_with_coord tries to find a station with given coords
+ * @param xy the coords where we search for a station
+ * @return the station id,NO_STATION if no station found
+ */
 StationID Datastructures::find_station_with_coord(Coord xy)
 {
-    auto stat = stat_coords.find(xy);
+    auto stat = stat_coords.find(xy);   //O(log(n))
     if(stat==stat_coords.end()){return NO_STATION;}
     else{return stat->second;}
 
 }
 
 //perftest 10/10
+/**
+ * @brief change_station_coord changes a stations coordinates in datastructures
+ * @param id is the id of the station which coordinates are going to be modified
+ * @param newcoord are the new coordinates for the station in question
+ * @return false if there is no station with id id, elsewise returns true
+ */
 bool Datastructures::change_station_coord(StationID id, Coord newcoord)
 {
     auto i = Stations.find(id); //O(log (n))
@@ -168,8 +220,14 @@ bool Datastructures::change_station_coord(StationID id, Coord newcoord)
     }
 }
 
-//perftest 6/10
-//too many commands?
+//perftest 10/10
+/**
+ * @brief add_departure adds a train departure for a station
+ * @param stationid the station which the train is deaprting from
+ * @param trainid the deaprting train id
+ * @param time is the time the departing train departs
+ * @return false if no station found with id, true elsewise
+ */
 bool Datastructures::add_departure(StationID stationid, TrainID trainid, Time time)
 {
     auto stat = Stations.find(stationid);
@@ -185,29 +243,40 @@ bool Datastructures::add_departure(StationID stationid, TrainID trainid, Time ti
 
 //perftest 10/10
 //still more commands than ref implementation
+/**
+ * @brief remove_departure removes a trains departure from a station
+ * @param stationid the stations id the departure is being removed from
+ * @param trainid the trains id which is departing
+ * @param time the time the train is departing
+ * @return false if no station found, true elsewise
+ */
 bool Datastructures::remove_departure(StationID stationid, TrainID trainid, Time time)
 {
-    auto stat = Stations.find(stationid);
-    if(stat==Stations.end()){   //O(log(n))
+    auto stat = Stations.find(stationid);   //O(log(n))
+    if(stat==Stations.end()){
         return false;
     }
     else{
-        auto dep = stat->second->departures_.find(time);
+        auto dep = stat->second->departures_.find(time);    //O(log(n))
         if(dep==stat->second->departures_.end() or dep->second!=trainid){
             return false;
         }
         else{
-            stat->second->departures_.erase(time);
+            stat->second->departures_.erase(time);  //O(log(n))
             return true;
         }
     }
 }
 
 
-//funktion pitää järjestää lähdöt aikajärjestykseen
-//PASKA FUNKTIO
-//perftest 6/10
+//perftest 10/10
 // too much commands?
+/**
+ * @brief station_departures_after gathers the departures from the station after a given time
+ * @param stationid is the id of the station which deaprtures are going to be checked
+ * @param time is the time after which the departures are going to be displayed
+ * @return  a vector which has pairs of departure time and the dperating trainid
+ */
 std::vector<std::pair<Time, TrainID>> Datastructures::station_departures_after(StationID stationid, Time time)
 {
     std::vector<std::pair<Time,TrainID>> stat_deps = {};
@@ -226,7 +295,13 @@ std::vector<std::pair<Time, TrainID>> Datastructures::station_departures_after(S
 }
 
 
-
+/**
+ * @brief add_region adds a region to the datastructures
+ * @param id is the regions id which is goin to be added
+ * @param name is the name of the region
+ * @param coords are the coords of the region
+ * @return false if region already exists, true elsewise
+ */
 bool Datastructures::add_region(RegionID id, const Name &name, std::vector<Coord> coords)
 {
     if(Regions.find(id)!=Regions.end()){    //O(log (n))
@@ -239,6 +314,10 @@ bool Datastructures::add_region(RegionID id, const Name &name, std::vector<Coord
     }
 }
 
+/**
+ * @brief all_regions return all region ids in the datastructures
+ * @return a vector with all region ids in the datastructures
+ */
 std::vector<RegionID> Datastructures::all_regions()
 {
     std::vector<RegionID> all_regs ={};
@@ -250,6 +329,11 @@ std::vector<RegionID> Datastructures::all_regions()
 
 //perftest region_info 6/10
 //should be almost constant??
+/**
+ * @brief get_region_name gets the region with id id, name
+ * @param id the regions id which name is being searched
+ * @return the name of the region with id id, NO_NAME if no region found
+ */
 Name Datastructures::get_region_name(RegionID id)
 {
     if(Regions.find(id)==Regions.end()){    //O(log (n))
@@ -262,6 +346,11 @@ Name Datastructures::get_region_name(RegionID id)
 
 //perftest region_info 6/10
 //should be almost constant??
+/**
+ * @brief get_region_coords returns coordinates of a region
+ * @param id is the id of the region which coordinates we are after
+ * @return a vector with the regions coordinates, if no region found vec only element is NO_COORD
+ */
 std::vector<Coord> Datastructures::get_region_coords(RegionID id)
 {
     if(Regions.find(id)==Regions.end()){    //O(log (n))
@@ -272,7 +361,12 @@ std::vector<Coord> Datastructures::get_region_coords(RegionID id)
     }
 }
 
-
+/**
+ * @brief add_subregion_to_region adds a subregion for a region in every needed datastructure
+ * @param id the subregions id
+ * @param parentid the parent regions id
+ * @return false if no parentregion or subregion found, true elsewise
+ */
 bool Datastructures::add_subregion_to_region(RegionID id, RegionID parentid)
 {
     if(Regions.find(parentid)==Regions.end()){  //O(log(n))
@@ -291,7 +385,12 @@ bool Datastructures::add_subregion_to_region(RegionID id, RegionID parentid)
     }
 }
 
-
+/**
+ * @brief add_station_to_region adds a station for a region in every needed datastructure
+ * @param id the adding stations id
+ * @param parentid the regions id which the station is put into
+ * @return false if either the station or the region doesn't exist, true otherwise
+ */
 bool Datastructures::add_station_to_region(StationID id, RegionID parentid)
 {
     auto preg = Regions.find(parentid);
@@ -309,18 +408,24 @@ bool Datastructures::add_station_to_region(StationID id, RegionID parentid)
 
 
 //could be faster
-//perftest 3/10
+//perftest 6/10
 //should be almost totally constant
+/**
+ * @brief station_in_regions finds all the regions which the station is in
+ * @param id the stations id which parentregions are searched for
+ * @return a vector with every parent region id, if no parent regions, or no station found
+ *          only element will be NO_REGION
+ */
 std::vector<RegionID> Datastructures::station_in_regions(StationID id)
 {
     std::vector<RegionID> stat_in_regs ={};
-    auto stat = Stations.find(id);
-    if(stat==Stations.end()){  //O(log(n))
+    auto stat = Stations.find(id);  //O(log(n))
+    if(stat==Stations.end()){
         return {NO_REGION};
     }
     else{
         auto ptr = stat->second->in_reg_;
-        while(ptr){ //O(n)?
+        while(ptr){ //O(n of parents)
             stat_in_regs.push_back(ptr->rid_);  //O(1)
             ptr = ptr->parent_;
         }
@@ -329,11 +434,21 @@ std::vector<RegionID> Datastructures::station_in_regions(StationID id)
 }
 
 
+//EI TOIMI ATM 0/2 func test
+//dumped core?
 //vois olla parempi?
+/**
+ * @brief allsubofreg goes through subregions of a region to add their id:s to a vector
+ * @param p the region which is currently being checked
+ * @param allsubregs a vector with the subregions ids
+ */
 void Datastructures::allsubofreg(std::shared_ptr<Region> p,std::vector<RegionID>& allsubregs){
 
     //for region in p:s subregion
-    if(p){
+    if(p->sub_regions_.size()==0){
+        return;
+    }
+    else {
         for(const auto& reg : p->sub_regions_){//O(n)
 
             //add region id to vec
@@ -343,12 +458,20 @@ void Datastructures::allsubofreg(std::shared_ptr<Region> p,std::vector<RegionID>
             //with region
             allsubofreg(reg,allsubregs);    //O(n)
         }
+        return;
     }
-    return;
 }
 
 
+//EI TOIMI ATM 0/2 func test
+//dumped core?
 //suht nopea
+//perftest 10/10
+/**
+ * @brief all_subregions_of_region searches all subregions of a given region and its subregions subregions .... .. ...
+ * @param id the id of the region which subregions we are going through
+ * @return a vector with all the subregions ids
+ */
 std::vector<RegionID> Datastructures::all_subregions_of_region(RegionID id)
 {
     std::vector<RegionID> allsubregs = {};
@@ -359,23 +482,38 @@ std::vector<RegionID> Datastructures::all_subregions_of_region(RegionID id)
 
 //FUNKTIO EI OLE HYVÄ
 //SAA HELPOSTI PARANNETTUA
+/**
+ * @brief stations_closest_to searches for 3 closest stations to input coordinates
+ * @param xy the coordinates of what we want to be closest to
+ * @return a vector with 3 closest stations ids
+ */
 std::vector<StationID> Datastructures::stations_closest_to(Coord xy)
 {
     std::vector<StationID> closest_stat_ids={};
-    std::map<int,StationID> closest={};
+    std::multimap<int,StationID> closest={};
     for(const auto& stat : Stations){   //O(n)
         int dist = sqrt(((stat.second->coords_.x - xy.x) * (stat.second->coords_.x - xy.x)) + ((stat.second->coords_.y - xy.y) * (stat.second->coords_.y - xy.y)));
-        closest.insert({dist,stat.second->id_});    //O(log (n))
+        closest.insert({dist,stat.second->id_});    //O(log(n))
     }
-    for(const auto& i : closest){   //O(n))
-        if(closest_stat_ids.size()==3){break;}
-        else{closest_stat_ids.push_back(i.second);} //O(1)
+    for(const auto& stat : closest){    //O(3)
+        if(closest_stat_ids.size()==3){
+            break;
+        }
+        else{
+            closest_stat_ids.push_back(stat.second);    //O(1)
+        }
     }
     return closest_stat_ids;
 }
 
 
-
+//3/10 perf
+//should be log(n)
+/**
+ * @brief remove_station removes a station from needed datastructures
+ * @param id the stations id going to be removed
+ * @return false if no station found with id, true elsewise
+ */
 bool Datastructures::remove_station(StationID id)
 {
     auto i = Stations.find(id); //O(log (n))
@@ -383,12 +521,10 @@ bool Datastructures::remove_station(StationID id)
         return false;
     }
     else{
+        stat_names.erase(stat_names.find(i->second->name_));    //O(2log(n))
+
         for(auto& stat : stat_dists){   //O(n)
             if(stat.second==id){stat_dists.erase(stat.first);break;}    //O(log (n))
-        }
-
-        for(auto& stat : stat_names){   //O(n)
-            if(stat.second==id){stat_names.erase(stat.first);break;}  //O(log (n))
         }
 
         Stations.erase(i);  //O(1)
@@ -397,16 +533,26 @@ bool Datastructures::remove_station(StationID id)
 }
 
 
-
-bool Datastructures::dequrecu(std::shared_ptr<Region> reg,std::deque<RegionID>& path){
+/**
+ * @brief dequrecu is a recursive function to go through regions parentregions and add their id to a deque
+ * @param reg is a shared_ptr to the region which is currently being checked
+ * @param path is a deque to contain the path from the starting region to the greatest parent region
+ */
+void Datastructures::dequrecu(std::shared_ptr<Region> reg,std::deque<RegionID>& path){
     path.push_front(reg->rid_);
-    if(!reg->parent_){return false;}
+    if(!reg->parent_){return;}
     else{dequrecu(reg->parent_,path);}
-    return true;
 }
 
-
-//PASKA FUNKTIO
+//EI TOIMI ATM 0/2 func test
+//dumped core?
+//perftest 10/10
+/**
+ * @brief common_parent_of_regions finds the closest common parent to 2 regions
+ * @param id1 the 1 regions id
+ * @param id2 the 2 regions id
+ * @return the closest common parents id, if no common parent returns NO_REGION
+ */
 RegionID Datastructures::common_parent_of_regions(RegionID id1, RegionID id2)
 {
     std::deque<RegionID> path1 = {};
