@@ -66,15 +66,7 @@ void Datastructures::clear_all()
     stat_names.clear(); //O(n)
     stat_coords.clear();//O(n)
     stat_dists.clear(); //O(n)
-    for(auto& stat : Stations){ //O(n)
-        stat.second->in_reg_ = nullptr;
-    }
     Stations.clear();   //O(n)
-    for(auto& reg : Regions){   //O(n)
-        reg.second->parent_=nullptr;
-        reg.second->sub_regions_.clear();
-        reg.second->reg_stations_.clear();
-    }
     Regions.clear();    //O(n)
 
 }
