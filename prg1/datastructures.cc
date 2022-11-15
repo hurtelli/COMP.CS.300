@@ -101,10 +101,11 @@ bool Datastructures::add_station(StationID id, const Name& name, Coord xy)
 {
     auto i = Stations.find(id); //O(log(n))
     if(i==Stations.end()){
-        std::shared_ptr<Station> station(new Station{id, name, xy,static_cast<int>(distance(xy)),{}});
+        int dist =distance(xy);
+        std::shared_ptr<Station> station(new Station{id, name, xy,dist,{}});
         Stations.insert({id,station});  //O(log(n))
         stat_names.insert({name,id}); //O(log(n))
-        stat_dists.insert({distance(xy),id});  //O(log(n))
+        stat_dists.insert({dist,id});  //O(log(n))
         stat_coords.insert({xy,id});
         return true;
     }
@@ -492,10 +493,9 @@ std::vector<StationID> Datastructures::stations_closest_to(Coord xy)
 {
     std::vector<StationID> closest_stat_ids={};
     std::multimap<int,StationID> closest={};
-    std::deque<Coord> mem={};
 
     for(const auto& stat : Stations){   //O(n)
-        int dist = sqrt(pow((stat.second->coords_.x - xy.x),2) + pow((stat.second->coords_.y - xy.y),2));
+        int dist = (stat.second->coords_.x - xy.x)*(stat.second->coords_.x - xy.x) + (stat.second->coords_.y - xy.y)*(stat.second->coords_.y - xy.y);
         closest.insert({dist,stat.second->id_});    //O(log(n))
     }
     for(const auto& stat : closest){    //O(3)
@@ -511,9 +511,7 @@ std::vector<StationID> Datastructures::stations_closest_to(Coord xy)
 }
 
 
-//0/10 perf (worse than nlogn)
-//should be log(n)
-//ehkä joku kikka
+//10/10perf
 /**
  * @brief remove_station removes a station from needed datastructures
  * @param id the stations id going to be removed

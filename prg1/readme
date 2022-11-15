@@ -28,6 +28,7 @@ Datastructures.hh
 			id_ = the id of the station
 			name_ = the name of the station
 			coords_ = the stations location coordinates
+			dist_ = distance of coords_ to 0,0
 			departures_ = train departures from the station
 			in_reg_ = pointer to the Region object, in which this station is in
 		
@@ -59,8 +60,6 @@ Datastructures.hh
 	THIS is one the main struggles while making this. The choice of wether to add or not a 
 	new storage for some 'niche' data was hard. More containers would make some functions run
 	faster, but they would make some functions run slower.
-	As an example, the remove_station func is exceptionally bad, due to having multiple
-	containers, which the station needs to be deleted from.
 	
 	These containers are:
 			[These containers are used to store objects, sorted by an attribute]
@@ -69,6 +68,6 @@ Datastructures.hh
 		multimap stat_dists = key is the stations distance to 0,0, value is the id
 
 	I chose to use these containers, to have stations be sorted, so there wouldn't need to
-	be sorting in the function, which has a bad complexity.
+	be sorting in the function, which has a bad complexity. This has been a good choice  		performance wise.
 		
 
