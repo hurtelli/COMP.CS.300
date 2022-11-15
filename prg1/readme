@@ -1,0 +1,74 @@
+COMP.CS.300 Programming project phase 1
+
+Datastructures.hh
+
+	This is the class for storing the data for the software
+
+
+	This class is supposed to store information about Train Stations and Regions,
+	in which the stations are.
+	
+
+	The Stations and Regions felt that they clearly should be implemented with structs
+	due to the values they need to possess. Having these objects storing the information
+	important to them makes simple data getting easy. These structs could've had
+	some more niche data stored to them to make the functions faster i.e. I tested
+	to make the Region have a path from the eldest parent down to it stored into it,
+	but I chose not to implement it, due to the path function being too complicated.
+
+	(Hindsighted, these could've had a good impact on the functions performance-wise,
+	if the performancetests didn't create new objects and erase these paths, but instead
+	if the perf tests would've called more times for an objects path, which had been previously
+	calculated and placed as an attribute of the object.)
+
+
+	There are two structs that are fundamentally what they are named after
+
+		1.Station "Holds the needed information for one instance of a station"
+			id_ = the id of the station
+			name_ = the name of the station
+			coords_ = the stations location coordinates
+			departures_ = train departures from the station
+			in_reg_ = pointer to the Region object, in which this station is in
+		
+		2.Region "Holds the needed information for one instance of a region"
+			rid_ = Region ID
+			rname_ = Region NAME
+			rcoords_ = Region coordinates
+			sub_regions_ = sub regions of the region
+			reg_stations_ = stations in this region
+			parent_ = Parent region of this region
+
+
+	Storing the main data (Stations and Regions) is done with shared pointers to these 
+	Station and Region objects. The pointers are stored in maps Stations and Regions.
+		
+		I chose to use shared_ptrs to create these struct objects, in order
+		to test how they perform in this task, creating them, accessing them and
+		deleting them.
+		Another reason was that I had some problems with the deletion of these objects
+		which led to considerable memoryleaks. Shared_ptr is brilliant, because it
+		grants great access to managing the lifetime of obejcts.
+
+	The choice of a map to hold these pointers was pretty straightforward, due to the
+	low complexity of map.find() to search for an object. Multimaps could've been tested
+	with, but it never struck me with being needed while making this.
+
+
+	The datastructures also has a few more containers to store some more specific data.
+	THIS is one the main struggles while making this. The choice of wether to add or not a 
+	new storage for some 'niche' data was hard. More containers would make some functions run
+	faster, but they would make some functions run slower.
+	As an example, the remove_station func is exceptionally bad, due to having multiple
+	containers, which the station needs to be deleted from.
+	
+	These containers are:
+			[These containers are used to store objects, sorted by an attribute]
+		multimap stat_names = a container to have all the station names as keys with a 						value of station id
+		multimap stat_coords = key is the coordinates and value is the id
+		multimap stat_dists = key is the stations distance to 0,0, value is the id
+
+	I chose to use these containers, to have stations be sorted, so there wouldn't need to
+	be sorting in the function, which has a bad complexity.
+		
+

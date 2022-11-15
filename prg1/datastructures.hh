@@ -197,7 +197,7 @@ public:
 
     // Non-compulsory operations
 
-    // Estimate of performance: O(log(n))
+    // Estimate of performance: O(n*log(n))
     // Short rationale for estimate: SLOW?
     std::vector<RegionID> all_subregions_of_region(RegionID id);
 
@@ -220,8 +220,8 @@ private:
     //debug
     //create the external doc for this prg
 
-    //find out what is the complexity of station_in_regions
-                                    //and all_subregions_of_region
+    //find out what is the complexity of all_subregions_of_region
+            //if not nlogn
 
     //fix funcs common_parent_of_regions
             //and all_subregions_of_region
@@ -260,7 +260,7 @@ private:
     std::multimap<Name,StationID> stat_names;
     std::multimap<Coord,StationID> stat_coords;
 
-    //toisin päin nopeempi???
+
     std::multimap<unsigned int,StationID> stat_dists;
 
     std::map<RegionID,std::shared_ptr<Region>> Regions;

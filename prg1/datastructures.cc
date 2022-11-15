@@ -140,7 +140,7 @@ Name Datastructures::get_station_name(StationID id)
 }
 
 //perftest station_info 6/10
-//should be about const
+//should be about const or log(n)?
 /**
  * @brief get_station_coordinates finds the coordinates of a station
  * @param id is the id of the station which coordinates we search
@@ -436,7 +436,6 @@ std::vector<RegionID> Datastructures::station_in_regions(StationID id)
 
 //EI TOIMI ATM 0/2 func test
 //dumped core?
-//vois olla parempi?
 /**
  * @brief allsubofreg goes through subregions of a region to add their id:s to a vector
  * @param p the region which is currently being checked
@@ -482,6 +481,8 @@ std::vector<RegionID> Datastructures::all_subregions_of_region(RegionID id)
 
 //FUNKTIO EI OLE HYVÄ
 //SAA HELPOSTI PARANNETTUA
+//pitäis olla parempi kuin nlogn
+//kikkaa stat_distsillä??
 /**
  * @brief stations_closest_to searches for 3 closest stations to input coordinates
  * @param xy the coordinates of what we want to be closest to
@@ -507,8 +508,9 @@ std::vector<StationID> Datastructures::stations_closest_to(Coord xy)
 }
 
 
-//3/10 perf
+//0/10 perf (worse than nlogn)
 //should be log(n)
+//ehkä joku kikka
 /**
  * @brief remove_station removes a station from needed datastructures
  * @param id the stations id going to be removed
