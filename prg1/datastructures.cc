@@ -101,7 +101,7 @@ bool Datastructures::add_station(StationID id, const Name& name, Coord xy)
 {
     auto i = Stations.find(id); //O(log(n))
     if(i==Stations.end()){
-        std::shared_ptr<Station> station(new Station{id, name, xy,{}});
+        std::shared_ptr<Station> station(new Station{id, name, xy,static_cast<int>(distance(xy)),{}});
         Stations.insert({id,station});  //O(log(n))
         stat_names.insert({name,id}); //O(log(n))
         stat_dists.insert({distance(xy),id});  //O(log(n))
@@ -495,7 +495,7 @@ std::vector<StationID> Datastructures::stations_closest_to(Coord xy)
     std::deque<Coord> mem={};
 
     for(const auto& stat : Stations){   //O(n)
-        int dist = sqrt(((stat.second->coords_.x - xy.x) * (stat.second->coords_.x - xy.x)) + ((stat.second->coords_.y - xy.y) * (stat.second->coords_.y - xy.y)));
+        int dist = sqrt(pow((stat.second->coords_.x - xy.x),2) + pow((stat.second->coords_.y - xy.y),2));
         closest.insert({dist,stat.second->id_});    //O(log(n))
     }
     for(const auto& stat : closest){    //O(3)
@@ -526,14 +526,10 @@ bool Datastructures::remove_station(StationID id)
         return false;
     }
     else{
-        //TESTI TÄSSÄ MUISTA EPÄKOMMENTOIDA
-        /*
         stat_names.erase(stat_names.find(i->second->name_));    //O(2log(n))
 
-        for(auto& stat : stat_dists){   //O(n)
-            if(stat.second==id){stat_dists.erase(stat.first);break;}    //O(log (n))
-        }
-        */
+        stat_dists.erase(stat_dists.find(i->second->dist_));     //O(2log(n))
+
         Stations.erase(i);  //O(1)
         return true;
     }

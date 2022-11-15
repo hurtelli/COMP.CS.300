@@ -207,8 +207,8 @@ public:
                                         //has O(log(n)) on every occasion.
     std::vector<StationID> stations_closest_to(Coord xy);
 
-    // Estimate of performance: O(n*log(n))
-    // Short rationale for estimate: highest term 2*n*log(n)
+    // Estimate of performance: O(log(n))
+    // Short rationale for estimate: highest term 2*log(n)
     bool remove_station(StationID id);
 
     // Estimate of performance: O(n)
@@ -226,6 +226,7 @@ private:
         StationID id_="";
         Name name_=NO_NAME;
         Coord coords_=NO_COORD;
+        int dist_ = NO_VALUE;
 
         std::multimap<Time,StationID> departures_ = {};
 
