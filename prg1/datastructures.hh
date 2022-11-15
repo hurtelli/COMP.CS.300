@@ -47,6 +47,7 @@ struct Coord
 
 // Example: Defining == and hash function for Coord so that it can be used
 // as key for std::unordered_map/set, if needed
+inline bool operator>(Coord c1, Coord c2){return c1.x>c2.x && c1.y>c2.y;}
 inline bool operator==(Coord c1, Coord c2) { return c1.x == c2.x && c1.y == c2.y; }
 inline bool operator!=(Coord c1, Coord c2) { return !(c1==c2); } // Not strictly necessary
 
@@ -198,14 +199,15 @@ public:
     // Non-compulsory operations
 
     // Estimate of performance: O(n*log(n))
-    // Short rationale for estimate: SLOW?
+    // Short rationale for estimate: Has actually a good complexity, it is recursive but not O(n)
     std::vector<RegionID> all_subregions_of_region(RegionID id);
 
     // Estimate of performance: O(n*log(n))
-    // Short rationale for estimate: SLOW
+    // Short rationale for estimate: Very slow complexity, due to loop of O(n) which
+                                        //has O(log(n)) on every occasion.
     std::vector<StationID> stations_closest_to(Coord xy);
 
-    // Estimate of performance: O(log(n))
+    // Estimate of performance: O(n*log(n))
     // Short rationale for estimate: highest term 2*n*log(n)
     bool remove_station(StationID id);
 
@@ -216,18 +218,7 @@ public:
 private:
 
 //TODO:
-    //get the complexities right on this document
-    //debug
-    //create the external doc for this prg
-
-    //find out what is the complexity of all_subregions_of_region
-            //if not nlogn
-
-    //fix funcs common_parent_of_regions
-            //and all_subregions_of_region
-
-    //improve stations_closest_to
-            //and remove_station
+    //
 
     struct Region;
 

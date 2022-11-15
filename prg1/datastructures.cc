@@ -492,6 +492,8 @@ std::vector<StationID> Datastructures::stations_closest_to(Coord xy)
 {
     std::vector<StationID> closest_stat_ids={};
     std::multimap<int,StationID> closest={};
+    std::deque<Coord> mem={};
+
     for(const auto& stat : Stations){   //O(n)
         int dist = sqrt(((stat.second->coords_.x - xy.x) * (stat.second->coords_.x - xy.x)) + ((stat.second->coords_.y - xy.y) * (stat.second->coords_.y - xy.y)));
         closest.insert({dist,stat.second->id_});    //O(log(n))
@@ -504,6 +506,7 @@ std::vector<StationID> Datastructures::stations_closest_to(Coord xy)
             closest_stat_ids.push_back(stat.second);    //O(1)
         }
     }
+
     return closest_stat_ids;
 }
 
@@ -523,6 +526,8 @@ bool Datastructures::remove_station(StationID id)
         return false;
     }
     else{
+        //TESTI TÄSSÄ MUISTA EPÄKOMMENTOIDA
+
         stat_names.erase(stat_names.find(i->second->name_));    //O(2log(n))
 
         for(auto& stat : stat_dists){   //O(n)
