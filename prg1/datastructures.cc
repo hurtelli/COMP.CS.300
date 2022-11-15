@@ -114,6 +114,7 @@ bool Datastructures::add_station(StationID id, const Name& name, Coord xy)
     }
 }
 
+//performance-wise sqrt is slow
 /**
  * @brief distance calculates the coordinates distance from 0,0
  * @param xy the coordinates to be calculated with
@@ -133,11 +134,15 @@ unsigned int Datastructures::distance(Coord& xy){
  */
 Name Datastructures::get_station_name(StationID id)
 {
+
+    /*
     auto i = Stations.find(id); //O(log(n))
     if(i==Stations.end()){return NO_NAME;}
     else{
         return i->second->name_;
     }
+    */
+    return Stations.at(id)->name_;
 }
 
 //perftest station_info 6/10
@@ -149,12 +154,14 @@ Name Datastructures::get_station_name(StationID id)
  */
 Coord Datastructures::get_station_coordinates(StationID id)
 {
-
+    /*
     auto i =Stations.find(id); //O(log(n))
     if(i==Stations.end()){return NO_COORD;}
     else{
         return i->second->coords_;
     }
+    */
+    return Stations.at(id)->coords_;
 }
 
 //perftest 10/10
@@ -479,7 +486,15 @@ std::vector<RegionID> Datastructures::all_subregions_of_region(RegionID id)
     return allsubregs;
 }
 
-
+/**
+ * @brief fdist calculates the fast distance of two coordinates, WITHOUT a square root
+ * @param c1 the first coordinates
+ * @param c2 the second coordinates
+ * @return the distances square
+ */
+int fdist(Coord c1,Coord c2){
+    return (c1.x-c2.x)*(c1.x-c2.x) - (c1.y-c2.y)*(c1.y-c2.y);
+}
 //FUNKTIO EI OLE HYVÄ
 //SAA HELPOSTI PARANNETTUA
 //pitäis olla parempi kuin nlogn
@@ -493,11 +508,11 @@ std::vector<StationID> Datastructures::stations_closest_to(Coord xy)
 {
     std::vector<StationID> closest_stat_ids={};
     std::multimap<int,StationID> closest={};
-
     for(const auto& stat : Stations){   //O(n)
         int dist = (stat.second->coords_.x - xy.x)*(stat.second->coords_.x - xy.x) + (stat.second->coords_.y - xy.y)*(stat.second->coords_.y - xy.y);
         closest.insert({dist,stat.second->id_});    //O(log(n))
     }
+
     for(const auto& stat : closest){    //O(3)
         if(closest_stat_ids.size()==3){
             break;
