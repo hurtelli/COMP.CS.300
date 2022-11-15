@@ -527,13 +527,13 @@ bool Datastructures::remove_station(StationID id)
     }
     else{
         //TESTI TÄSSÄ MUISTA EPÄKOMMENTOIDA
-
+        /*
         stat_names.erase(stat_names.find(i->second->name_));    //O(2log(n))
 
         for(auto& stat : stat_dists){   //O(n)
             if(stat.second==id){stat_dists.erase(stat.first);break;}    //O(log (n))
         }
-
+        */
         Stations.erase(i);  //O(1)
         return true;
     }
