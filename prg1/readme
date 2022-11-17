@@ -68,6 +68,14 @@ Datastructures.hh
 		multimap stat_dists = key is the stations distance to 0,0, value is the id
 
 	I chose to use these containers, to have stations be sorted, so there wouldn't need to
-	be sorting in the function, which has a bad complexity. This has been a good choice  		performance wise.
+	be sorting in the function, which has a bad complexity. This has been a good choice performance wise.
+
+
+
+
+HINDSIGHT POINTS
+
+The station_info reference seems constant, so it must've been made with a vector, or deque, where the indexes
+are also the stations id?! That way the 1929'th element would correspond to the station with id 1929. Indexes would have NO_* as their value, until changed(which is FAST). This also wouldn't take up that much space, as one could think?
 		
 

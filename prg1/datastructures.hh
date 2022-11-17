@@ -182,7 +182,7 @@ public:
     std::vector<Coord> get_region_coords(RegionID id);
 
     // Estimate of performance: O(log(n))
-    // Short rationale for estimate: Highest term in the function
+    // Short rationale for estimate: Highest term in the function is O(n) but kinda not
                                     //map.find()
     bool add_subregion_to_region(RegionID id, RegionID parentid);
 

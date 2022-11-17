@@ -62,11 +62,15 @@ unsigned int Datastructures::station_count()
  */
 void Datastructures::clear_all()
 {
-
+    Stations.clear();   //O(n)
     stat_names.clear(); //O(n)
     stat_coords.clear();//O(n)
     stat_dists.clear(); //O(n)
-    Stations.clear();   //O(n)
+    for(auto& reg : Regions){   //O(n)
+        reg.second->parent_=nullptr;
+        reg.second->sub_regions_.clear();
+        reg.second->reg_stations_.clear();
+    }
     Regions.clear();    //O(n)
 
 }
@@ -130,14 +134,11 @@ unsigned int Datastructures::distance(Coord& xy){
  */
 Name Datastructures::get_station_name(StationID id)
 {
-
-    /*
     auto i = Stations.find(id); //O(log(n))
     if(i==Stations.end()){return NO_NAME;}
     else{
         return i->second->name_;
     }
-    */
     return Stations.at(id)->name_;
 }
 
@@ -150,13 +151,11 @@ Name Datastructures::get_station_name(StationID id)
  */
 Coord Datastructures::get_station_coordinates(StationID id)
 {
-    /*
     auto i =Stations.find(id); //O(log(n))
     if(i==Stations.end()){return NO_COORD;}
     else{
         return i->second->coords_;
     }
-    */
     return Stations.at(id)->coords_;
 }
 
@@ -381,9 +380,15 @@ bool Datastructures::add_subregion_to_region(RegionID id, RegionID parentid)
             return false;
         }
         else{
-            Regions[parentid]->sub_regions_.push_back(Regions[id]);
-            Regions[id]->parent_ = Regions[parentid];
-
+            auto v = Regions[parentid]->sub_regions_;
+            auto i = std::find(v.begin(),v.end(),id);   //O(n)
+            if(i==v.end()){
+                return false;
+            }
+            else{
+                v.push_back(Regions[id]);
+                Regions[id]->parent_ = Regions[parentid];
+            }
             return true;
         }
     }
@@ -537,8 +542,13 @@ bool Datastructures::remove_station(StationID id)
     else{
         stat_names.erase(stat_names.find(i->second->name_));    //O(2log(n))
 
-        stat_dists.erase(stat_dists.find(i->second->dist_));     //O(2log(n))
 
+        auto n = stat_dists.equal_range(i->second->dist_);  //O(log(n))
+        for(auto& a=n.first;a!=n.second;++a){   //O(k)
+            if(a->second==id){
+                stat_dists.erase(a);     //O(log(n))
+            }
+        }
         Stations.erase(i);  //O(1)
         return true;
     }
