@@ -62,10 +62,14 @@ unsigned int Datastructures::station_count()
  */
 void Datastructures::clear_all()
 {
-    Stations.clear();   //O(n)
+
     stat_names.clear(); //O(n)
     stat_coords.clear();//O(n)
     stat_dists.clear(); //O(n)
+    for(auto& stat : Stations){
+        stat.second->in_reg_=nullptr;
+    }
+    Stations.clear();   //O(n)
     for(auto& reg : Regions){   //O(n)
         reg.second->parent_=nullptr;
         reg.second->sub_regions_.clear();
@@ -376,17 +380,20 @@ bool Datastructures::add_subregion_to_region(RegionID id, RegionID parentid)
         return false;
     }
     else{
-        if(Regions.find(id)==Regions.end()){    //O(log(n))
+        auto newreg =Regions.find(id);
+        if(newreg==Regions.end()){    //O(log(n))
             return false;
         }
         else{
-            auto v = Regions[parentid]->sub_regions_;
-            auto i = std::find(v.begin(),v.end(),id);   //O(n)
-            if(i==v.end()){
+
+            auto& v = Regions[parentid]->sub_regions_;
+            auto& reg = Regions[id];
+            auto i = std::find(v.begin(),v.end(),reg);   //O(n)
+            if(i!=v.end()){
                 return false;
             }
             else{
-                v.push_back(Regions[id]);
+                v.push_back(Regions[id]);   //O(1)
                 Regions[id]->parent_ = Regions[parentid];
             }
             return true;
@@ -541,13 +548,8 @@ bool Datastructures::remove_station(StationID id)
     }
     else{
         stat_names.erase(stat_names.find(i->second->name_));    //O(2log(n))
-
-
-        auto n = stat_dists.equal_range(i->second->dist_);  //O(log(n))
-        for(auto& a=n.first;a!=n.second;++a){   //O(k)
-            if(a->second==id){
-                stat_dists.erase(a);     //O(log(n))
-            }
+        for(auto& stat : stat_dists){   //O(n)
+            if(stat.second==id){stat_dists.erase(stat.first);break;}    //O(log (n))
         }
         Stations.erase(i);  //O(1)
         return true;
