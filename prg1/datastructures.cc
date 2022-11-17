@@ -554,8 +554,15 @@ bool Datastructures::remove_station(StationID id)
     }
     else{
         stat_names.erase(stat_names.find(i->second->name_));    //O(2log(n))
-        for(auto& stat : stat_dists){   //O(n)
-            if(stat.second==id){stat_dists.erase(stat.first);break;}    //O(log (n))
+
+
+        auto n = stat_dists.find(i->second->dist_);  //O(log(n))
+        auto m = n;
+        while(m->first==n->first and m->second!=id){
+            ++n;
+        }
+        if(m->first==n->first and m->second==n->second){
+            stat_dists.erase(n);
         }
         Stations.erase(i);  //O(1)
         return true;
