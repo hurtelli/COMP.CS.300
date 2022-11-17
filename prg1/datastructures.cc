@@ -489,9 +489,15 @@ void Datastructures::allsubofreg(std::shared_ptr<Region> p,std::vector<RegionID>
  */
 std::vector<RegionID> Datastructures::all_subregions_of_region(RegionID id)
 {
-    std::vector<RegionID> allsubregs = {};
-    allsubofreg(Regions[id],allsubregs);    //O(?)
-    return allsubregs;
+    auto reg = Regions.find(id);
+    if(reg==Regions.end()){
+        return {NO_REGION};
+    }
+    else{
+        std::vector<RegionID> allsubregs = {};
+        allsubofreg(Regions[id],allsubregs);    //O(?)
+        return allsubregs;
+    }
 }
 
 /**
@@ -579,6 +585,11 @@ void Datastructures::dequrecu(std::shared_ptr<Region> reg,std::deque<RegionID>& 
  */
 RegionID Datastructures::common_parent_of_regions(RegionID id1, RegionID id2)
 {
+    auto reg1 = Regions.find(id1);
+    auto reg2 = Regions.find(id2);
+    if(reg1==Regions.end() or reg2==Regions.end()){
+        return NO_REGION;
+    }
     std::deque<RegionID> path1 = {};
     std::deque<RegionID> path2 = {};
     dequrecu(Regions[id1],path1);   //O(n)
