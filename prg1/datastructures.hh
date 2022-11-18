@@ -242,8 +242,8 @@ private:
         Name rname_=NO_NAME;
         std::vector<Coord> rcoords_={NO_COORD};
 
-        std::map<RegionID,std::shared_ptr<Region>> sub_regions_ ={};
-        std::map<StationID,std::shared_ptr<Station>> reg_stations_ = {};
+        std::unordered_map<RegionID,std::shared_ptr<Region>> sub_regions_ ={};
+        std::unordered_map<StationID,std::shared_ptr<Station>> reg_stations_ = {};
         //std::deque<RegionID> reg_path_ = {};
 
         std::shared_ptr<Region> parent_ = nullptr;
@@ -251,14 +251,14 @@ private:
 
 
     // Add stuff needed for your class implementation here
-    std::map<StationID,std::shared_ptr<Station>> Stations;
+    std::unordered_map<StationID,std::shared_ptr<Station>> Stations;
     std::multimap<Name,StationID> stat_names;
     std::multimap<Coord,StationID> stat_coords;
 
 
     std::multimap<unsigned int,StationID> stat_dists;
 
-    std::map<RegionID,std::shared_ptr<Region>> Regions;
+    std::unordered_map<RegionID,std::shared_ptr<Region>> Regions;
 
     unsigned int distance(Coord&);
     void allsubofreg(std::shared_ptr<Region>,std::vector<RegionID>&);
