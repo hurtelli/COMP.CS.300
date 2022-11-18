@@ -218,7 +218,8 @@ public:
 private:
 
 //TODO:
-    //stations distance increasing ei toimi syystä x
+    //alphabetically korjaus
+    //stations distance increasing ei toimi syystä, että change coord ei vaiha
 
 
     struct Region;

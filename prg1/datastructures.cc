@@ -170,10 +170,13 @@ Coord Datastructures::get_station_coordinates(StationID id)
 std::vector<StationID> Datastructures::stations_alphabetically()
 {
     std::vector<StationID> ret = {};
-    for(const auto& stat : Stations){
-        ret.push_back(stat.second->id_);
+    std::multimap<Name,StationID> srtr = {};
+    for(const auto& stat : Stations){   //O(n)
+        srtr.insert({stat.second->name_,stat.second->id_}); //O(log(n))
     }
-    std::sort(ret.begin(),ret.end());
+    for(const auto& stat : srtr){   //O(n)
+        ret.push_back(stat.second); //O(1)
+    }
     return ret;
 }
 
