@@ -63,7 +63,7 @@ unsigned int Datastructures::station_count()
 void Datastructures::clear_all()
 {
 
-
+    stat_names.clear(); //O(n)
     stat_coords.clear();//O(n)
     stat_dists.clear(); //O(n)
     for(auto& stat : Stations){
@@ -108,6 +108,7 @@ bool Datastructures::add_station(StationID id, const Name& name, Coord xy)
         int dist =distance(xy);
         std::shared_ptr<Station> station(new Station{id, name, xy,dist,{}});
         Stations.insert({id,station});  //O(log(n))
+        stat_names.insert({name,id});    //O(log(n))
         stat_dists.insert({dist,id});  //O(log(n))
         stat_coords.insert({xy,id});
         return true;
@@ -170,12 +171,8 @@ Coord Datastructures::get_station_coordinates(StationID id)
 std::vector<StationID> Datastructures::stations_alphabetically()
 {
     std::vector<StationID> ret = {};
-    std::multimap<Name,StationID> srtr = {};
-    for(const auto& stat : Stations){   //O(n)
-        srtr.insert({stat.second->name_,stat.second->id_}); //O(log(n))
-    }
-    for(const auto& stat : srtr){   //O(n)
-        ret.push_back(stat.second); //O(1)
+    for(const auto& stat : stat_names){   //O(n)
+        ret.push_back(stat.second);
     }
     return ret;
 }
@@ -557,6 +554,7 @@ bool Datastructures::remove_station(StationID id)
         return false;
     }
     else{
+        stat_names.erase(stat_names.find(i->second->name_));
         //Here we find stats with the same dists and go through
         //only them, to have better complexity
         //O(log(n)) instead of O(n)

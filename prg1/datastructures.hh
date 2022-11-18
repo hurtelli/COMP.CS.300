@@ -252,7 +252,7 @@ private:
     // Add stuff needed for your class implementation here
     std::unordered_map<StationID,std::shared_ptr<Station>> Stations;
     std::multimap<Coord,StationID> stat_coords;
-
+    std::multimap<Name,StationID> stat_names;
 
     std::multimap<unsigned int,StationID> stat_dists;
 
