@@ -387,13 +387,11 @@ bool Datastructures::add_subregion_to_region(RegionID id, RegionID parentid)
         else{
 
             auto& v = Regions[parentid]->sub_regions_;
-            auto& reg = Regions[id];
-            auto i = std::find(v.begin(),v.end(),reg);   //O(n)
-            if(i!=v.end()){
+            if(v.find(id)!=v.end()){
                 return false;
             }
             else{
-                v.push_back(Regions[id]);   //O(1)
+                v.insert({id,Regions[id]});   //O(log(n))
                 Regions[id]->parent_ = Regions[parentid];
             }
             return true;
@@ -467,11 +465,11 @@ void Datastructures::allsubofreg(std::shared_ptr<Region> p,std::vector<RegionID>
         for(const auto& reg : p->sub_regions_){//O(n)
 
             //add region id to vec
-            allsubregs.push_back(reg->rid_);    //O(1)
+            allsubregs.push_back(reg.second->rid_);    //O(1)
 
             //go through subregs recursively
             //with region
-            allsubofreg(reg,allsubregs);    //O(n)
+            allsubofreg(reg.second,allsubregs);    //O(n)
         }
         return;
     }
