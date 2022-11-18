@@ -393,6 +393,7 @@ bool Datastructures::add_subregion_to_region(RegionID id, RegionID parentid)
                 return false;
             }
             else{
+                parent->second->sub_regions_.insert({id,newreg->second});
                 newreg->second->parent_ = parent->second;
                 return true;
             }
