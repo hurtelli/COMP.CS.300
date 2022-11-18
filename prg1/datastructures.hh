@@ -242,8 +242,8 @@ private:
         Name rname_=NO_NAME;
         std::vector<Coord> rcoords_={NO_COORD};
 
-        std::unordered_map<RegionID,std::shared_ptr<Region>> sub_regions_ ={};
-        std::unordered_map<StationID,std::shared_ptr<Station>> reg_stations_ = {};
+        std::map<RegionID,std::shared_ptr<Region>> sub_regions_ ={};
+        std::map<StationID,std::shared_ptr<Station>> reg_stations_ = {};
         //std::deque<RegionID> reg_path_ = {};
 
         std::shared_ptr<Region> parent_ = nullptr;
