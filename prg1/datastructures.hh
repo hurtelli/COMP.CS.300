@@ -218,10 +218,8 @@ public:
 private:
 
 //TODO:
-    //TARKISTA COMPULSORY aika
-    //ÄDÄÄMISEEN MENEE HELVETISTI AIKAA PASKA ON RIKKI
-        //Todennäkösesti kyse add_sub2reg uudesta muutoksesta lineaarisella find
-            //subregions vectorista mappiin?
+    //stations distance increasing ei toimi syystä x
+
 
     struct Region;
 
@@ -242,7 +240,7 @@ private:
         Name rname_=NO_NAME;
         std::vector<Coord> rcoords_={NO_COORD};
 
-        std::unordered_map<RegionID,std::shared_ptr<Region>> sub_regions_ ={};
+        std::vector<std::shared_ptr<Region>> sub_regions_ ={};
         std::unordered_map<StationID,std::shared_ptr<Station>> reg_stations_ = {};
         //std::deque<RegionID> reg_path_ = {};
 
@@ -252,7 +250,6 @@ private:
 
     // Add stuff needed for your class implementation here
     std::unordered_map<StationID,std::shared_ptr<Station>> Stations;
-    std::multimap<Name,StationID> stat_names;
     std::multimap<Coord,StationID> stat_coords;
 
 

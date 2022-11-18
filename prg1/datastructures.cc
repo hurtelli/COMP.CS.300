@@ -63,7 +63,7 @@ unsigned int Datastructures::station_count()
 void Datastructures::clear_all()
 {
 
-    stat_names.clear(); //O(n)
+
     stat_coords.clear();//O(n)
     stat_dists.clear(); //O(n)
     for(auto& stat : Stations){
@@ -108,7 +108,6 @@ bool Datastructures::add_station(StationID id, const Name& name, Coord xy)
         int dist =distance(xy);
         std::shared_ptr<Station> station(new Station{id, name, xy,dist,{}});
         Stations.insert({id,station});  //O(log(n))
-        stat_names.insert({name,id}); //O(log(n))
         stat_dists.insert({dist,id});  //O(log(n))
         stat_coords.insert({xy,id});
         return true;
@@ -171,9 +170,10 @@ Coord Datastructures::get_station_coordinates(StationID id)
 std::vector<StationID> Datastructures::stations_alphabetically()
 {
     std::vector<StationID> ret = {};
-    for(auto& i : stat_names){  //O(n)
-        ret.push_back(i.second);    //O(1)
+    for(const auto& stat : Stations){
+        ret.push_back(stat.second->id_);
     }
+    std::sort(ret.begin(),ret.end());
     return ret;
 }
 
@@ -393,7 +393,7 @@ bool Datastructures::add_subregion_to_region(RegionID id, RegionID parentid)
                 return false;
             }
             else{
-                parent->second->sub_regions_.insert({id,newreg->second});
+                parent->second->sub_regions_.push_back(newreg->second);
                 newreg->second->parent_ = parent->second;
                 return true;
             }
@@ -468,11 +468,11 @@ void Datastructures::allsubofreg(std::shared_ptr<Region> p,std::vector<RegionID>
         for(const auto& reg : p->sub_regions_){//O(n)
 
             //add region id to vec
-            allsubregs.push_back(reg.second->rid_);    //O(1)
+            allsubregs.push_back(reg->rid_);    //O(1)
 
             //go through subregs recursively
             //with region
-            allsubofreg(reg.second,allsubregs);    //O(n)
+            allsubofreg(reg,allsubregs);    //O(n)
         }
         return;
     }
@@ -554,9 +554,10 @@ bool Datastructures::remove_station(StationID id)
         return false;
     }
     else{
-        stat_names.erase(stat_names.find(i->second->name_));    //O(2log(n))
-
-
+        //Here we find stats with the same dists and go through
+        //only them, to have better complexity
+        //O(log(n)) instead of O(n)
+        //when finding the stat
         auto n = stat_dists.find(i->second->dist_);  //O(log(n))
         auto m = n;
         while(m->first==n->first and m->second!=id){
