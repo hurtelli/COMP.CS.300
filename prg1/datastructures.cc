@@ -376,25 +376,27 @@ std::vector<Coord> Datastructures::get_region_coords(RegionID id)
  */
 bool Datastructures::add_subregion_to_region(RegionID id, RegionID parentid)
 {
-    if(Regions.find(parentid)==Regions.end()){  //O(log(n))
+    const auto& parent = Regions.find(parentid);
+    if(parent==Regions.end()){  //O(log(n))
         return false;
     }
-    else{
-        auto newreg =Regions.find(id);
+    else{ 
+        const auto& newreg =Regions.find(id);
         if(newreg==Regions.end()){    //O(log(n))
             return false;
         }
         else{
-
-            auto& v = Regions[parentid]->sub_regions_;
-            if(v.find(id)!=v.end()){
+            //
+            //TÄHÄN PELKKÄ PARENTCHECKKI, TÄLLÄ NOPEUTUU
+            //
+            if(newreg->second->parent_!=nullptr){
                 return false;
             }
             else{
-                v.insert({id,Regions[id]});   //O(log(n))
-                Regions[id]->parent_ = Regions[parentid];
+                newreg->second->parent_ = parent->second;
+                return true;
             }
-            return true;
+
         }
     }
 }
