@@ -66,9 +66,11 @@ void Datastructures::clear_all()
     stat_names.clear(); //O(n)
     stat_coords.clear();//O(n)
     stat_dists.clear(); //O(n)
+    /*
     for(auto& stat : Stations){
         stat.second->in_reg_=nullptr;
     }
+    */
     Stations.clear();   //O(n)
     for(auto& reg : Regions){   //O(n)
         reg.second->parent_=nullptr;
@@ -143,7 +145,6 @@ Name Datastructures::get_station_name(StationID id)
     else{
         return i->second->name_;
     }
-    return Stations.at(id)->name_;
 }
 
 //perftest station_info 6/10
@@ -160,7 +161,6 @@ Coord Datastructures::get_station_coordinates(StationID id)
     else{
         return i->second->coords_;
     }
-    return Stations.at(id)->coords_;
 }
 
 //perftest 10/10
@@ -220,8 +220,18 @@ bool Datastructures::change_station_coord(StationID id, Coord newcoord)
         return false;;
     }
     else{
-        stat_coords.erase(i->second->coords_);
-        stat_coords.insert({newcoord,id});
+        stat_coords.erase(i->second->coords_);  //O(log(n))
+        stat_coords.insert({newcoord,id});  //O(log(n))
+
+        auto n = stat_dists.find(i->second->dist_);  //O(log(n))
+        auto m = n;
+        while(m->first==n->first and m->second!=id){
+            ++n;
+        }
+        if(m->first==n->first and m->second==n->second){
+            stat_dists.erase(n);    //O(1)
+        }
+
         i->second->coords_ = newcoord;
         return true;
     }
@@ -237,19 +247,18 @@ bool Datastructures::change_station_coord(StationID id, Coord newcoord)
  */
 bool Datastructures::add_departure(StationID stationid, TrainID trainid, Time time)
 {
-    auto stat = Stations.find(stationid);
-    if(stat==Stations.end()){   //O(log (n))
+    auto stat = Stations.find(stationid);   //O(log (n))
+    if(stat==Stations.end()){
         return false;
     }
     else{
-        stat->second->departures_.insert({time,trainid});   //O(1)
+        stat->second->departures_.insert({time,trainid});   //O(log (n))
         return true;
     }
 }
 
 
 //perftest 10/10
-//still more commands than ref implementation
 /**
  * @brief remove_departure removes a trains departure from a station
  * @param stationid the stations id the departure is being removed from
@@ -269,7 +278,7 @@ bool Datastructures::remove_departure(StationID stationid, TrainID trainid, Time
             return false;
         }
         else{
-            stat->second->departures_.erase(time);  //O(log(n))
+            stat->second->departures_.erase(dep);  //O(1)
             return true;
         }
     }
@@ -288,7 +297,7 @@ std::vector<std::pair<Time, TrainID>> Datastructures::station_departures_after(S
 {
     std::vector<std::pair<Time,TrainID>> stat_deps = {};
     auto stat = Stations.find(stationid);
-    if(stat==Stations.end()){   //=(log (n))
+    if(stat==Stations.end()){   //O(log (n))
         stat_deps.push_back({NO_TIME,NO_STATION}); //O(1)
     }
     else{
@@ -343,11 +352,12 @@ std::vector<RegionID> Datastructures::all_regions()
  */
 Name Datastructures::get_region_name(RegionID id)
 {
-    if(Regions.find(id)==Regions.end()){    //O(log (n))
+    const auto& reg = Regions.find(id);    //O(log (n))
+    if(reg==Regions.end()){
         return NO_NAME;
     }
     else{
-        return Regions[id]->rname_;
+        return reg->second->rname_;
     }
 }
 
@@ -376,20 +386,17 @@ std::vector<Coord> Datastructures::get_region_coords(RegionID id)
  */
 bool Datastructures::add_subregion_to_region(RegionID id, RegionID parentid)
 {
-    const auto& parent = Regions.find(parentid);
-    if(parent==Regions.end()){  //O(log(n))
+    const auto& parent = Regions.find(parentid);  //O(log(n))
+    if(parent==Regions.end()){
         return false;
     }
     else{ 
-        const auto& newreg =Regions.find(id);
-        if(newreg==Regions.end()){    //O(log(n))
+        const auto& newreg =Regions.find(id);    //O(log(n))
+        if(newreg==Regions.end()){
             return false;
         }
         else{
-            //
-            //TÄHÄN PELKKÄ PARENTCHECKKI, TÄLLÄ NOPEUTUU
-            //
-            if(newreg->second->parent_!=nullptr){
+            if(newreg->second->parent_){
                 return false;
             }
             else{
@@ -410,9 +417,9 @@ bool Datastructures::add_subregion_to_region(RegionID id, RegionID parentid)
  */
 bool Datastructures::add_station_to_region(StationID id, RegionID parentid)
 {
-    auto preg = Regions.find(parentid);
-    auto stat = Stations.find(id);
-    if(preg==Regions.end() or stat==Stations.end()){ //O(log(n))
+    auto preg = Regions.find(parentid); //O(log(n))
+    auto stat = Stations.find(id);  //O(log(n))
+    if(preg==Regions.end() or stat==Stations.end()){
         return false;
     }
     else{
@@ -451,8 +458,6 @@ std::vector<RegionID> Datastructures::station_in_regions(StationID id)
 }
 
 
-//EI TOIMI ATM 0/2 func test
-//dumped core?
 /**
  * @brief allsubofreg goes through subregions of a region to add their id:s to a vector
  * @param p the region which is currently being checked
@@ -479,8 +484,6 @@ void Datastructures::allsubofreg(std::shared_ptr<Region> p,std::vector<RegionID>
 }
 
 
-//EI TOIMI ATM 0/2 func test
-//dumped core?
 //suht nopea
 //perftest 10/10
 /**
@@ -508,8 +511,9 @@ std::vector<RegionID> Datastructures::all_subregions_of_region(RegionID id)
  * @return the distances square
  */
 int fdist(Coord c1,Coord c2){
-    return (c1.x-c2.x)*(c1.x-c2.x) - (c1.y-c2.y)*(c1.y-c2.y);
+    return (c1.x-c2.x)*(c1.x-c2.x) + (c1.y-c2.y)*(c1.y-c2.y);
 }
+
 //FUNKTIO EI OLE HYVÄ
 //SAA HELPOSTI PARANNETTUA
 //pitäis olla parempi kuin nlogn
@@ -524,7 +528,7 @@ std::vector<StationID> Datastructures::stations_closest_to(Coord xy)
     std::vector<StationID> closest_stat_ids={};
     std::multimap<int,StationID> closest={};
     for(const auto& stat : Stations){   //O(n)
-        int dist = (stat.second->coords_.x - xy.x)*(stat.second->coords_.x - xy.x) + (stat.second->coords_.y - xy.y)*(stat.second->coords_.y - xy.y);
+        int dist = fdist(stat.second->coords_,xy);
         closest.insert({dist,stat.second->id_});    //O(log(n))
     }
 
@@ -554,7 +558,12 @@ bool Datastructures::remove_station(StationID id)
         return false;
     }
     else{
-        stat_names.erase(stat_names.find(i->second->name_));
+        stat_names.erase(i->second->name_);    //O(log(n))
+
+        //Instruction say that a case where two stats have the same coords
+        //shouldn't be possible and should not be counted for
+        stat_coords.erase(i->second->coords_);  //O(log(n))
+
         //Here we find stats with the same dists and go through
         //only them, to have better complexity
         //O(log(n)) instead of O(n)
@@ -565,8 +574,9 @@ bool Datastructures::remove_station(StationID id)
             ++n;
         }
         if(m->first==n->first and m->second==n->second){
-            stat_dists.erase(n);
+            stat_dists.erase(n);    //O(1)
         }
+
         Stations.erase(i);  //O(1)
         return true;
     }
@@ -584,8 +594,7 @@ void Datastructures::dequrecu(std::shared_ptr<Region> reg,std::deque<RegionID>& 
     else{dequrecu(reg->parent_,path);}
 }
 
-//EI TOIMI ATM 0/2 func test
-//dumped core?
+
 //perftest 10/10
 /**
  * @brief common_parent_of_regions finds the closest common parent to 2 regions
@@ -600,10 +609,15 @@ RegionID Datastructures::common_parent_of_regions(RegionID id1, RegionID id2)
     if(reg1==Regions.end() or reg2==Regions.end()){
         return NO_REGION;
     }
+    //deques to store path from a reg to the masterests reg
     std::deque<RegionID> path1 = {};
     std::deque<RegionID> path2 = {};
-    dequrecu(Regions[id1],path1);   //O(n)
-    dequrecu(Regions[id2],path2);   //O(n)
+
+    //recursive finding out
+    dequrecu(reg1->second,path1);   //O(n)
+    dequrecu(reg2->second,path2);   //O(n)
+
+    //range = bigger path size
     int range = (path1.size()>path2.size()) ? path1.size() : path2.size();
     for(int i=0;i<range;++i){   //O(n)
         if(path1.at(i)==path2.at(i)){

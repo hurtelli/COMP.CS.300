@@ -218,8 +218,7 @@ public:
 private:
 
 //TODO:
-    //alphabetically korjaus
-    //stations distance increasing ei toimi syystä, että change coord ei vaiha
+    //
 
 
     struct Region;
@@ -243,7 +242,6 @@ private:
 
         std::vector<std::shared_ptr<Region>> sub_regions_ ={};
         std::unordered_map<StationID,std::shared_ptr<Station>> reg_stations_ = {};
-        //std::deque<RegionID> reg_path_ = {};
 
         std::shared_ptr<Region> parent_ = nullptr;
     };
@@ -260,9 +258,7 @@ private:
 
     unsigned int distance(Coord&);
     void allsubofreg(std::shared_ptr<Region>,std::vector<RegionID>&);
-    std::vector<RegionID> recu(std::shared_ptr<Region>,std::vector<RegionID>&);
     void dequrecu(std::shared_ptr<Region>,std::deque<RegionID>&);
-    RegionID iter_forward(std::shared_ptr<Region>,std::vector<RegionID>&);
 };
 
 #endif // DATASTRUCTURES_HH
