@@ -231,6 +231,7 @@ bool Datastructures::change_station_coord(StationID id, Coord newcoord)
         if(m->first==n->first and m->second==n->second){
             stat_dists.erase(n);    //O(1)
         }
+        stat_dists.insert({distance(newcoord),id});
 
         i->second->coords_ = newcoord;
         return true;
