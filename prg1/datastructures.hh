@@ -18,6 +18,7 @@
 #include <map>
 #include <deque>
 #include <memory>
+#include <iostream>
 
 
 // Types for IDs
@@ -148,7 +149,7 @@ public:
     StationID find_station_with_coord(Coord xy);
 
     // Estimate of performance: O(log(n))
-    // Short rationale for estimate: one map.find()
+    // Short rationale for estimate: highest term is 4log(n)
     bool change_station_coord(StationID id, Coord newcoord);
 
     // Estimate of performance: O(log(n))
@@ -190,7 +191,7 @@ public:
     // Short rationale for estimate: map.insert() | map.find()
     bool add_station_to_region(StationID id, RegionID parentid);
 
-    // Estimate of performance: O(log(n))
+    // Estimate of performance: O(n*log(n))
     // Short rationale for estimate: highest term is O(n), but the n
                                     //isn't the n, but instead k region
                                     //parent amount.
@@ -227,7 +228,7 @@ private:
         StationID id_="";
         Name name_=NO_NAME;
         Coord coords_=NO_COORD;
-        int dist_ = NO_VALUE;
+        unsigned int dist_ = NO_VALUE;
 
         std::multimap<Time,StationID> departures_ = {};
 

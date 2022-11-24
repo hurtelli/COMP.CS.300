@@ -107,7 +107,7 @@ bool Datastructures::add_station(StationID id, const Name& name, Coord xy)
 {
     auto i = Stations.find(id); //O(log(n))
     if(i==Stations.end()){
-        int dist =distance(xy);
+        unsigned int dist =distance(xy);
         std::shared_ptr<Station> station(new Station{id, name, xy,dist,{}});
         Stations.insert({id,station});  //O(log(n))
         stat_names.insert({name,id});    //O(log(n))
@@ -231,7 +231,7 @@ bool Datastructures::change_station_coord(StationID id, Coord newcoord)
         if(m->first==n->first and m->second==n->second){
             stat_dists.erase(n);    //O(1)
         }
-        stat_dists.insert({distance(newcoord),id});
+        stat_dists.insert({distance(newcoord),id}); //O(log(n))
 
         i->second->coords_ = newcoord;
         return true;
@@ -400,13 +400,17 @@ bool Datastructures::add_subregion_to_region(RegionID id, RegionID parentid)
             if(newreg->second->parent_){
                 return false;
             }
-            else{
-                parent->second->sub_regions_.push_back(newreg->second);
-                newreg->second->parent_ = parent->second;
-                return true;
+            auto i = parent->second;
+            while(i->parent_){
+                if(i==newreg->second){
+                    return false;
+                }
             }
-
+            parent->second->sub_regions_.push_back(newreg->second);
+            newreg->second->parent_ = parent->second;
+            return true;
         }
+
     }
 }
 
@@ -565,18 +569,32 @@ bool Datastructures::remove_station(StationID id)
         //shouldn't be possible and should not be counted for
         stat_coords.erase(i->second->coords_);  //O(log(n))
 
+
         //Here we find stats with the same dists and go through
         //only them, to have better complexity
-        //O(log(n)) instead of O(n)
         //when finding the stat
-        auto n = stat_dists.find(i->second->dist_);  //O(log(n))
-        auto m = n;
-        while(m->first==n->first and m->second!=id){
-            ++n;
+        auto d = distance(i->second->coords_);
+        auto n = stat_dists.find(d);  //O(log(n))
+        if(n==stat_dists.end()){
+            return false;
         }
-        if(m->first==n->first and m->second==n->second){
-            stat_dists.erase(n);    //O(1)
+
+        auto c = stat_dists.count(d);  //O(log(n))
+
+        auto m=n;
+        if(c<=1){
+            stat_dists.erase(n);
         }
+        else{
+            while(m->first==d){ //O(k)
+                if(m->second==id){
+                    stat_dists.erase(m);  //O(log(n))
+                    break;
+                }
+                ++m;
+            }
+        }
+
 
         Stations.erase(i);  //O(1)
         return true;
