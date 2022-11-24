@@ -405,6 +405,7 @@ bool Datastructures::add_subregion_to_region(RegionID id, RegionID parentid)
                 if(i==newreg->second){
                     return false;
                 }
+                i=i->parent_;
             }
             parent->second->sub_regions_.push_back(newreg->second);
             newreg->second->parent_ = parent->second;
